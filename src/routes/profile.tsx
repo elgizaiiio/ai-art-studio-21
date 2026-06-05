@@ -27,10 +27,8 @@ function ProfilePage() {
 
   return (
     <AppShell>
-      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
-        <button onClick={() => navigate({ to: "/" })} className="text-[13px] text-white/80">‹ Back</button>
+      <div className="px-4 pt-4 pb-3 text-center">
         <h1 className="text-[15px] font-semibold text-white">Profile</h1>
-        <div className="size-9" />
       </div>
 
       <div className="px-6 pt-6 flex flex-col items-center text-center">
