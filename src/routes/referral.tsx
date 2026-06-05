@@ -28,7 +28,7 @@ const BOT_USERNAME = "Gramaiibot";
 
 function ReferralPage() {
   const stats = useServerFn(getReferralStats);
-  const [data, setData] = useState<{ telegramId: string; referrals: number; pointsEarned: number; usdEarned: number } | null>(null);
+  const [data, setData] = useState<{ telegramId: string; referralCode: string | null; referrals: number; pointsEarned: number; usdEarned: number } | null>(null);
   const [copied, setCopied] = useState(false);
   const [tgFallback, setTgFallback] = useState(false);
 
@@ -47,8 +47,9 @@ function ReferralPage() {
     })();
   }, [stats]);
 
-  const link = data
-    ? `https://t.me/${BOT_USERNAME}/app?startapp=${data.telegramId}`
+  const startValue = data?.referralCode || data?.telegramId;
+  const link = startValue
+    ? `https://t.me/${BOT_USERNAME}/app?startapp=${encodeURIComponent(startValue)}`
     : `https://t.me/${BOT_USERNAME}/app`;
 
   function copy() {
