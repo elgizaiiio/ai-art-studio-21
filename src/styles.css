@@ -81,7 +81,7 @@
   --shadow-elevated: 0 12px 32px -8px oklch(0 0 0 / 0.5);
   --shadow-glow: 0 0 32px oklch(0.62 0.22 295 / 0.45);
 
-  --tg-safe-top: env(safe-area-inset-top, 0px);
+  --tg-safe-top: max(env(safe-area-inset-top, 0px), 56px);
   --tg-safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
