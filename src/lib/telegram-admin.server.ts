@@ -225,7 +225,7 @@ export async function handleAdminCallback(cb: any): Promise<void> {
   if (data === "a:addtpl")
     return void askForReply(
       chatId,
-      "<b>➕ Add template</b>\nReply with: <code>type | title | image_url | prompt</code>\n<i>type</i> = <code>image</code> or <code>video</code>.\nExample:\n<code>image | Cyberpunk portrait | https://… | A neon cyberpunk portrait, ultra detailed</code>",
+      "<b>➕ Add template</b>\nSend a <b>photo</b> as reply with caption: <code>type | title | prompt</code>\nOr send text only: <code>type | title | image_url | prompt</code>\n<i>type</i> = <code>image</code> or <code>video</code>.",
       TAG.addtpl,
     );
   if (data === "a:addtask")
@@ -280,7 +280,7 @@ export async function handleAdminCallback(cb: any): Promise<void> {
     const idPrefix = data.slice("a:tple:".length);
     return void askForReply(
       chatId,
-      `<b>✏️ Edit template</b> <code>${idPrefix}</code>\nReply with: <code>image_url | prompt</code> (use <code>-</code> to keep current).`,
+      `<b>✏️ Edit template</b> <code>${idPrefix}</code>\nReply with text: <code>image_url | prompt</code> or send a <b>new photo</b> with caption = new prompt (or <code>-</code> to keep prompt).`,
       `${TAG.edittpl}:${idPrefix}`,
     );
   }
