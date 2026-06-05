@@ -24,13 +24,15 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
 
           // Admin inline-keyboard callback handling
           if (update.callback_query) {
-            const { isAdmin } = await import("@/lib/telegram-bot.server");
+            const { isAdmin, tgAnswerCallback } = await import("@/lib/telegram-bot.server");
             const { handleAdminCallback } = await import("@/lib/telegram-admin.server");
             const fromId = update.callback_query.from?.id;
             if (isAdmin(fromId)) {
-              try { await handleAdminCallback(update.callback_query); } catch {}
+              await tgAnswerCallback(update.callback_query.id);
+              queueMicrotask(() => {
+                handleAdminCallback(update.callback_query, { skipAnswer: true }).catch(() => {});
+              });
             } else {
-              const { tgAnswerCallback } = await import("@/lib/telegram-bot.server");
               await tgAnswerCallback(update.callback_query.id, "Not authorized");
             }
             return Response.json({ ok: true });

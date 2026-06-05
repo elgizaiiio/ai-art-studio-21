@@ -1,13 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { House, SquareCheck, Sparkles, UserRoundPlus } from "lucide-react";
+import { House, ListTodo, Sparkles, TicketPercent } from "lucide-react";
 import { DesktopSidebar } from "./desktop-shell";
 import type { ReactNode } from "react";
 
 const tabs = [
   { to: "/", label: "Home", icon: House },
-  { to: "/tasks", label: "Tasks", icon: SquareCheck },
+  { to: "/tasks", label: "Tasks", icon: ListTodo },
   { to: "/pricing", label: "Pro", icon: Sparkles },
-  { to: "/referral", label: "Invite", icon: UserRoundPlus },
+  { to: "/referral", label: "Invite", icon: TicketPercent },
 ] as const;
 
 export function BottomNav() {
@@ -26,8 +26,8 @@ export function BottomNav() {
                     className={`flex flex-col items-center justify-center gap-0.5 rounded-full px-4 py-2 transition-colors ${active ? "bg-white/8" : ""}`}
                   >
                     <Icon
-                      strokeWidth={active ? 2.2 : 1.7}
-                      className={`size-[23px] ${active ? "text-primary fill-primary/15" : "text-white/85"}`}
+                      strokeWidth={active ? 2.15 : 1.85}
+                      className={`size-[22px] ${active ? "text-primary" : "text-white/82"}`}
                     />
                     <span className={`text-[10.5px] font-medium tracking-tight ${active ? "text-primary" : "text-white/70"}`}>{label}</span>
                   </Link>

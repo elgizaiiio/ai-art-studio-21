@@ -212,11 +212,13 @@ async function uploadTelegramPhotoToTemplateBucket(fileId: string) {
 
 // ---------- Public entry points ----------
 
-export async function handleAdminCallback(cb: any): Promise<void> {
+export async function handleAdminCallback(cb: any, options?: { skipAnswer?: boolean }): Promise<void> {
   const chatId = cb.message?.chat?.id as number;
   const messageId = cb.message?.message_id as number;
   const data: string = cb.data ?? "";
-  await tgAnswerCallback(cb.id);
+  if (!options?.skipAnswer) {
+    await tgAnswerCallback(cb.id);
+  }
 
   if (data === "a:menu") {
     return void tgEditMessage(chatId, messageId, "<b>👑 Gram Admin</b>\nPick a section:", { reply_markup: mainMenu() });
