@@ -1,13 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { IconHome, IconTasks, IconReferral, IconPricing } from "./icons";
+import { Sparkles, ListChecks, Crown, Users } from "lucide-react";
 import { DesktopSidebar } from "./desktop-shell";
 import type { ReactNode } from "react";
 
 const tabs = [
-  { to: "/", label: "Home", icon: IconHome },
-  { to: "/tasks", label: "Tasks", icon: IconTasks },
-  { to: "/pricing", label: "Pro", icon: IconPricing },
-  { to: "/referral", label: "Referral", icon: IconReferral },
+  { to: "/", label: "Home", icon: Sparkles },
+  { to: "/tasks", label: "Tasks", icon: ListChecks },
+  { to: "/pricing", label: "Pro", icon: Crown },
+  { to: "/referral", label: "Invite", icon: Users },
 ] as const;
 
 export function BottomNav() {
