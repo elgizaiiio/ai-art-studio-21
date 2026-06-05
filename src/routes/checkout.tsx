@@ -7,7 +7,6 @@ import { IconCheck } from "@/components/icons";
 import { createDodoCheckout, createStarsInvoice, getTonPaymentInfo, verifyTonPayment } from "@/lib/payments.functions";
 import { getInitData } from "@/lib/telegram";
 import { TonConnectUIProvider, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
-import { beginCell } from "@ton/core";
 
 const searchSchema = z.object({
   plan: z.enum(["starter", "pro", "ultra"]).default("pro"),
@@ -129,18 +128,16 @@ function CheckoutPage() {
             setTimeout(() => { unsub(); reject(new Error("wallet_connect_timeout")); }, 120000);
           });
         }
-        // 2) Build text-comment payload BoC (op=0 + UTF-8 text)
-        const payload = beginCell().storeUint(0, 32).storeStringTail(info.comment).endCell().toBoc().toString("base64");
-        // 3) Send transaction
+        // 2) Send transaction
         await tonConnectUI.sendTransaction({
           validUntil: Math.floor(Date.now() / 1000) + 600,
           messages: [{
             address: info.wallet,
             amount: String(Math.floor(info.amountTon * 1e9)),
-            payload,
+            payload: info.payload,
           }],
         });
-        // 4) Poll backend for on-chain verification
+        // 3) Poll backend for on-chain verification
         let tries = 0;
         const pollId = setInterval(async () => {
           tries++;
