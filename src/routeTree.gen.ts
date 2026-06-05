@@ -20,6 +20,7 @@ import { Route as ApiSendToBotRouteImport } from './routes/api/send-to-bot'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as TemplatesTypeIdRouteImport } from './routes/templates.$type.$id'
 import { Route as ApiPublicTonconnectManifestRouteImport } from './routes/api/public/tonconnect-manifest'
+import { Route as ApiPublicTelegramDebugRouteImport } from './routes/api/public/telegram-debug'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram.webhook'
 import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo.webhook'
 import { Route as ApiPublicBrandFileRouteImport } from './routes/api/public/brand.$file'
@@ -80,6 +81,11 @@ const ApiPublicTonconnectManifestRoute =
     path: '/api/public/tonconnect-manifest',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicTelegramDebugRoute = ApiPublicTelegramDebugRouteImport.update({
+  id: '/api/public/telegram-debug',
+  path: '/api/public/telegram-debug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTelegramWebhookRoute =
   ApiPublicTelegramWebhookRouteImport.update({
     id: '/api/public/telegram/webhook',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/api/send-to-bot': typeof ApiSendToBotRoute
   '/templates/$type': typeof TemplatesTypeRouteWithChildren
+  '/api/public/telegram-debug': typeof ApiPublicTelegramDebugRoute
   '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
   '/templates/$type/$id': typeof TemplatesTypeIdRoute
   '/api/public/brand/$file': typeof ApiPublicBrandFileRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/api/send-to-bot': typeof ApiSendToBotRoute
   '/templates/$type': typeof TemplatesTypeRouteWithChildren
+  '/api/public/telegram-debug': typeof ApiPublicTelegramDebugRoute
   '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
   '/templates/$type/$id': typeof TemplatesTypeIdRoute
   '/api/public/brand/$file': typeof ApiPublicBrandFileRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/api/send-to-bot': typeof ApiSendToBotRoute
   '/templates/$type': typeof TemplatesTypeRouteWithChildren
+  '/api/public/telegram-debug': typeof ApiPublicTelegramDebugRoute
   '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
   '/templates/$type/$id': typeof TemplatesTypeIdRoute
   '/api/public/brand/$file': typeof ApiPublicBrandFileRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/send-to-bot'
     | '/templates/$type'
+    | '/api/public/telegram-debug'
     | '/api/public/tonconnect-manifest'
     | '/templates/$type/$id'
     | '/api/public/brand/$file'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/send-to-bot'
     | '/templates/$type'
+    | '/api/public/telegram-debug'
     | '/api/public/tonconnect-manifest'
     | '/templates/$type/$id'
     | '/api/public/brand/$file'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/api/send-to-bot'
     | '/templates/$type'
+    | '/api/public/telegram-debug'
     | '/api/public/tonconnect-manifest'
     | '/templates/$type/$id'
     | '/api/public/brand/$file'
@@ -207,6 +219,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   ApiSendToBotRoute: typeof ApiSendToBotRoute
   TemplatesTypeRoute: typeof TemplatesTypeRouteWithChildren
+  ApiPublicTelegramDebugRoute: typeof ApiPublicTelegramDebugRoute
   ApiPublicTonconnectManifestRoute: typeof ApiPublicTonconnectManifestRoute
   ApiPublicBrandFileRoute: typeof ApiPublicBrandFileRoute
   ApiPublicDodoWebhookRoute: typeof ApiPublicDodoWebhookRoute
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTonconnectManifestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/telegram-debug': {
+      id: '/api/public/telegram-debug'
+      path: '/api/public/telegram-debug'
+      fullPath: '/api/public/telegram-debug'
+      preLoaderRoute: typeof ApiPublicTelegramDebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/telegram/webhook': {
       id: '/api/public/telegram/webhook'
       path: '/api/public/telegram/webhook'
@@ -338,6 +358,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   ApiSendToBotRoute: ApiSendToBotRoute,
   TemplatesTypeRoute: TemplatesTypeRouteWithChildren,
+  ApiPublicTelegramDebugRoute: ApiPublicTelegramDebugRoute,
   ApiPublicTonconnectManifestRoute: ApiPublicTonconnectManifestRoute,
   ApiPublicBrandFileRoute: ApiPublicBrandFileRoute,
   ApiPublicDodoWebhookRoute: ApiPublicDodoWebhookRoute,
@@ -346,3 +367,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
