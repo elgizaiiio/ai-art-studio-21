@@ -131,6 +131,7 @@ export const createStarsInvoice = createServerFn({ method: "POST" })
 export const getTonPaymentInfo = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => planCycle.parse(d))
   .handler(async ({ data }) => {
+    const { beginCell } = await import("@ton/core");
     const userId = await resolveUserId(data.initData);
     const usd = data.cycle === "monthly" ? PLAN_PRICE_USD[data.plan].monthly : PLAN_PRICE_USD[data.plan].yearly;
     // Fetch TON/USD spot
@@ -146,7 +147,8 @@ export const getTonPaymentInfo = createServerFn({ method: "POST" })
     const amountTon = +(usd / tonRate).toFixed(3);
     const comment = `gramai:${userId}:${data.plan}:${data.cycle}`;
     const tonLink = `ton://transfer/${TON_WALLET}?amount=${Math.floor(amountTon * 1e9)}&text=${encodeURIComponent(comment)}`;
-    return { wallet: TON_WALLET, amountTon, tonRate, comment, tonLink, amountUsd: usd };
+    const payload = beginCell().storeUint(0, 32).storeStringTail(comment).endCell().toBoc().toString("base64");
+    return { wallet: TON_WALLET, amountTon, tonRate, comment, tonLink, amountUsd: usd, payload };
   });
 
 // ---------- TON Verify ----------
