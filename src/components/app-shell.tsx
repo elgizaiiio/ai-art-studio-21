@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { CircleUserRound, House, ListTodo, Sparkles, TicketPercent } from "lucide-react";
+import { House, ListTodo, Sparkles, TicketPercent } from "lucide-react";
 import { DesktopSidebar } from "./desktop-shell";
 import type { ReactNode } from "react";
 
