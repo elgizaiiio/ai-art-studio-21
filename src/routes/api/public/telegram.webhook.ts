@@ -87,7 +87,7 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
             first_name: from.first_name ?? null,
             last_name: from.last_name ?? null,
             language_code: from.language_code ?? null,
-            points: 50,
+            points: 0,
           }, { onConflict: "telegram_id", ignoreDuplicates: true });
 
           // Admin entry: /111 opens the interactive admin panel
@@ -117,9 +117,6 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
               "<b>Video</b> — Veo 3.1, Kling 2.6, Seedance 2.0, Hailuo",
               "<b>Chat</b> — GPT-5, Gemini 3 Pro, Claude",
               "<b>Slides · Docs · Deep Research</b>",
-              "",
-              "<b>Pro plan</b> = <i>Unlimited · 0 credits</i> on premium models.",
-              "You start with <b>50 free credits</b>.",
             ].join("\n");
             const reply_markup = {
               inline_keyboard: [

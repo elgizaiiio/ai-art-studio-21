@@ -251,14 +251,6 @@ function CheckoutPage() {
           {processing ? "Processing…" : `Pay ${methods.find((m) => m.id === method)?.amount}`}
         </button>
         {error && <div className="mt-3 text-center text-[11.5px] text-red-300">{error}</div>}
-        {tonInfo && method === "ton" && (
-          <div className="mt-3 rounded-2xl bg-white/5 border border-white/10 p-3 text-[11.5px] text-white/75">
-            <div>Send <b>{tonInfo.amountTon} TON</b> to:</div>
-            <div className="mt-1 break-all font-mono text-white/85">{tonInfo.wallet}</div>
-            <div className="mt-1">Comment: <span className="font-mono">{tonInfo.comment}</span></div>
-            <div className="mt-1 text-white/55">Waiting for confirmation…</div>
-          </div>
-        )}
         <div className="mt-3 text-center text-[11px] text-white/45">Encrypted and secure</div>
       </div>
 
