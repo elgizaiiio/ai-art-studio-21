@@ -31,7 +31,7 @@ function CheckoutWrapper() {
   const manifestUrl =
     typeof window !== "undefined"
       ? `${window.location.origin}/api/public/tonconnect-manifest`
-      : "https://ai-art-studio-26.lovable.app/api/public/tonconnect-manifest";
+      : "https://gram.megsyai.com/api/public/tonconnect-manifest";
   return (
     <TonConnectUIProvider manifestUrl={manifestUrl}>
       <CheckoutPage />
