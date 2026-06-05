@@ -74,7 +74,7 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
           }
 
           const { tgSendMessage, tgSendChatAction, tgEditMessage, aiStream, systemForModel, mdToTelegramHtml, isAdmin } = await import("@/lib/telegram-bot.server");
-          const { openAdminPanel, handleAdminReply } = await import("@/lib/telegram-admin.server");
+          const { openAdminPanel, handleAdminReply, handleAdminPhotoReply } = await import("@/lib/telegram-admin.server");
           const { getAdmin } = await import("@/lib/supabase-admin.server");
           const chatId = msg.chat.id as number;
           const text: string = (msg.text ?? "").toString();
@@ -100,6 +100,10 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
             const handled = await handleAdminReply(chatId, msg.reply_to_message.text, text);
             if (handled) return Response.json({ ok: true });
           }
+          if (isAdmin(from.id) && msg.reply_to_message?.text && msg.photo?.length) {
+            const handled = await handleAdminPhotoReply(chatId, msg.reply_to_message.text, msg.photo, msg.caption ?? null);
+            if (handled) return Response.json({ ok: true });
+          }
 
           if (text.startsWith("/start")) {
             // Track /start press for admin stats
@@ -110,30 +114,21 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
               return `${proto}://${host}`;
             })();
             const caption = [
-              "<b>Welcome to Gram AI</b>",
-              "",
-              "Your all-in-one AI studio inside Telegram:",
-              "<b>Image</b> — Nano Banana, FLUX.2 Pro, GPT Image 2, Seedream 4.5",
-              "<b>Video</b> — Veo 3.1, Kling 2.6, Seedance 2.0, Hailuo",
-              "<b>Chat</b> — GPT-5, Gemini 3 Pro, Claude",
-              "<b>Slides · Docs · Deep Research</b>",
+              "<b>Gram AI</b>",
+              "All AI. One App.",
             ].join("\n");
             const reply_markup = {
               inline_keyboard: [
-                [{ text: "Open Gram AI", url: "https://t.me/Gramaiibot/App" }],
-                [
-                  { text: "Upgrade", web_app: { url: `${origin}/pricing` } },
-                  { text: "Invite & earn", web_app: { url: `${origin}/referral` } },
-                ],
-                [{ text: "Templates", web_app: { url: `${origin}/templates/image` } }],
+                [{ text: "Start App", web_app: { url: origin } }],
+                [{ text: "Join Our Community", url: "https://t.me/gramaic" }],
               ],
             };
             try {
               const { tgSendPhotoBytes } = await import("@/lib/telegram-bot.server");
-              const { data: img } = await getAdmin().storage.from("brand").download("gram-start.jpg");
+              const { data: img } = await getAdmin().storage.from("brand").download("gram-start-v2.jpg");
               if (!img) throw new Error("no_banner");
               const ab = await img.arrayBuffer();
-              await tgSendPhotoBytes(chatId, ab, "gram-start.jpg", "image/jpeg", caption, { parse_mode: "HTML", reply_markup });
+              await tgSendPhotoBytes(chatId, ab, "gram-start-v2.jpg", "image/jpeg", caption, { parse_mode: "HTML", reply_markup });
             } catch {
               await tgSendMessage(chatId, caption, { reply_markup });
             }
