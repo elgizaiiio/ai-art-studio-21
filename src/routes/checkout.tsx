@@ -153,7 +153,13 @@ function CheckoutPage() {
         return;
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Payment failed");
+      const msg = e instanceof Error ? e.message : "payment_failed";
+      const mapped =
+        msg === "missing_bot_token" ? "Telegram payment is not configured yet." :
+        msg === "missing_dodo_key" ? "Card payment is not configured yet." :
+        msg === "wallet_connect_timeout" ? "Wallet connection timed out. Try again." :
+        msg;
+      setError(mapped);
     } finally {
       setProcessing(false);
     }
@@ -162,18 +168,8 @@ function CheckoutPage() {
   return (
     <AppShell hideNav>
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 pt-4 pb-2">
-        <button
-          onClick={() => navigate({ to: "/pricing" })}
-          aria-label="Back"
-          className="size-9 rounded-full bg-white/8 border border-white/12 grid place-items-center text-white/85"
-        >
-          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
+      <div className="flex items-center justify-center px-4 pt-4 pb-2">
         <div className="text-[13px] font-medium text-white/70">Checkout</div>
-        <div className="size-9" />
       </div>
 
       {/* Title */}
