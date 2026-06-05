@@ -24,9 +24,17 @@ export const listTemplates = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ type: z.enum(["image", "video", "music"]) }).parse(d))
   .handler(async ({ data }) => {
     const { getAdmin } = await import("@/lib/supabase-admin.server");
-    const r = await getAdmin().from("templates").select("id,name,description,cover_url,prompt")
-      .eq("type", data.type).eq("active", true).order("sort_order");
-    return r.data ?? [];
+    const r = await getAdmin().from("templates")
+      .select("id,title,description,preview_url,prompt")
+      .eq("type", data.type).eq("is_active", true)
+      .order("created_at", { ascending: false });
+    return (r.data ?? []).map((t: any) => ({
+      id: t.id,
+      name: t.title,
+      description: t.description,
+      cover_url: t.preview_url,
+      prompt: t.prompt,
+    }));
   });
 
 export const getTemplate = createServerFn({ method: "POST" })
@@ -35,5 +43,13 @@ export const getTemplate = createServerFn({ method: "POST" })
     const { getAdmin } = await import("@/lib/supabase-admin.server");
     const r = await getAdmin().from("templates").select("*").eq("id", data.id).maybeSingle();
     if (!r.data) throw new Error("not_found");
-    return r.data;
+    const t: any = r.data;
+    return {
+      id: t.id,
+      name: t.title,
+      description: t.description,
+      cover_url: t.preview_url,
+      prompt: t.prompt,
+      type: t.type,
+    };
   });

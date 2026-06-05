@@ -18,6 +18,8 @@ const TAG = {
   addmodel: "‹addmodel›",
   delmodel: "‹delmodel›",
   broadcast: "‹broadcast›",
+  addtpl: "‹addtpl›",
+  edittpl: "‹edittpl›",
 } as const;
 
 function mainMenu() {
@@ -30,6 +32,10 @@ function mainMenu() {
       [
         { text: "📋 Tasks", callback_data: "a:tasks" },
         { text: "➕ Add task", callback_data: "a:addtask" },
+      ],
+      [
+        { text: "🖼 Templates", callback_data: "a:tpls" },
+        { text: "➕ Add template", callback_data: "a:addtpl" },
       ],
       [
         { text: "🤖 Models", callback_data: "a:models" },
@@ -136,6 +142,45 @@ async function renderModels(chatId: number, messageId: number) {
   await tgEditMessage(chatId, messageId, "<b>🤖 Models</b>\nTap to remove.", { reply_markup: { inline_keyboard: rows } });
 }
 
+async function renderTemplates(chatId: number, messageId: number) {
+  const db = getAdmin();
+  const { data } = await db.from("templates").select("id,title,type,is_active").order("created_at", { ascending: false }).limit(30);
+  const rows: any[] = (data ?? []).map((t: any) => [
+    { text: `${t.is_active ? "🖼" : "⛔"} [${t.type}] ${String(t.title).slice(0, 28)}`, callback_data: `a:tpl:${t.id.slice(0, 8)}` },
+  ]);
+  rows.push([{ text: "➕ Add template", callback_data: "a:addtpl" }]);
+  rows.push([{ text: "« Menu", callback_data: "a:menu" }]);
+  await tgEditMessage(chatId, messageId, "<b>🖼 Templates</b>\nTap a template to manage.", { reply_markup: { inline_keyboard: rows } });
+}
+
+async function renderTemplateDetail(chatId: number, messageId: number, idPrefix: string) {
+  const db = getAdmin();
+  const { data: rows } = await db.from("templates").select("*").like("id", `${idPrefix}%`).limit(1);
+  const t: any = rows?.[0];
+  if (!t) return tgEditMessage(chatId, messageId, "Template not found.", { reply_markup: backRow() });
+  const text = [
+    `<b>${t.title}</b>`,
+    `Type: <code>${t.type}</code>`,
+    t.preview_url ? `🖼 ${t.preview_url}` : "(no image)",
+    "",
+    `<i>Prompt:</i>`,
+    `<code>${(t.prompt ?? "").toString().slice(0, 800)}</code>`,
+    `Status: ${t.is_active ? "<b>active</b>" : "<b>inactive</b>"}`,
+  ].join("\n");
+  await tgEditMessage(chatId, messageId, text, {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "✏️ Edit", callback_data: `a:tple:${idPrefix}` },
+          { text: t.is_active ? "⛔ Deactivate" : "✅ Activate", callback_data: `a:tpltog:${idPrefix}` },
+          { text: "🗑 Delete", callback_data: `a:tpld:${idPrefix}` },
+        ],
+        [{ text: "« Templates", callback_data: "a:tpls" }],
+      ],
+    },
+  });
+}
+
 function askForReply(chatId: number, prompt: string, tag: string) {
   return tgSendMessage(chatId, `${prompt}\n\n${tag}`, {
     reply_markup: { force_reply: true, selective: true, input_field_placeholder: "Type and send" },
@@ -158,6 +203,13 @@ export async function handleAdminCallback(cb: any): Promise<void> {
   if (data === "a:starts") return void renderStarts(chatId, messageId);
   if (data === "a:tasks") return void renderTasks(chatId, messageId);
   if (data === "a:models") return void renderModels(chatId, messageId);
+  if (data === "a:tpls") return void renderTemplates(chatId, messageId);
+  if (data === "a:addtpl")
+    return void askForReply(
+      chatId,
+      "<b>➕ Add template</b>\nReply with: <code>type | title | image_url | prompt</code>\n<i>type</i> = <code>image</code> or <code>video</code>.\nExample:\n<code>image | Cyberpunk portrait | https://… | A neon cyberpunk portrait, ultra detailed</code>",
+      TAG.addtpl,
+    );
   if (data === "a:addtask")
     return void askForReply(
       chatId,
@@ -191,6 +243,29 @@ export async function handleAdminCallback(cb: any): Promise<void> {
     if (key in MODEL_PROFILES) delete (MODEL_PROFILES as any)[key];
     return void renderModels(chatId, messageId);
   }
+  if (data.startsWith("a:tpl:")) return void renderTemplateDetail(chatId, messageId, data.slice("a:tpl:".length));
+  if (data.startsWith("a:tpltog:")) {
+    const idPrefix = data.slice("a:tpltog:".length);
+    const db = getAdmin();
+    const { data: rows } = await db.from("templates").select("id,is_active").like("id", `${idPrefix}%`).limit(1);
+    if (rows?.[0]) await (db.from("templates") as any).update({ is_active: !rows[0].is_active }).eq("id", rows[0].id);
+    return void renderTemplateDetail(chatId, messageId, idPrefix);
+  }
+  if (data.startsWith("a:tpld:")) {
+    const idPrefix = data.slice("a:tpld:".length);
+    const db = getAdmin();
+    const { data: rows } = await db.from("templates").select("id").like("id", `${idPrefix}%`).limit(1);
+    if (rows?.[0]) await db.from("templates").delete().eq("id", rows[0].id);
+    return void renderTemplates(chatId, messageId);
+  }
+  if (data.startsWith("a:tple:")) {
+    const idPrefix = data.slice("a:tple:".length);
+    return void askForReply(
+      chatId,
+      `<b>✏️ Edit template</b> <code>${idPrefix}</code>\nReply with: <code>image_url | prompt</code> (use <code>-</code> to keep current).`,
+      `${TAG.edittpl}:${idPrefix}`,
+    );
+  }
 }
 
 // Called when admin sends a regular message that is a reply to one of our
@@ -213,6 +288,52 @@ export async function handleAdminReply(chatId: number, replyToText: string, payl
       verify_target: verify_target || null,
     }).select("id").single();
     await tgSendMessage(chatId, ins.error ? `❌ ${ins.error.message}` : `✅ Added task <code>${ins.data!.id.slice(0, 8)}</code>`, { reply_markup: mainMenu() });
+    return true;
+  }
+
+  if (replyToText.includes(TAG.addtpl)) {
+    const parts = payload.split("|").map((s) => s.trim());
+    if (parts.length < 4) {
+      await tgSendMessage(chatId, "❌ Need: type | title | image_url | prompt");
+      return true;
+    }
+    const [type, title, image_url, ...rest] = parts;
+    const prompt = rest.join(" | ");
+    if (!["image", "video", "music"].includes(type)) {
+      await tgSendMessage(chatId, "❌ type must be image, video, or music");
+      return true;
+    }
+    const ins = await db.from("templates").insert({
+      type, title,
+      preview_url: image_url || null,
+      prompt,
+      is_active: true,
+    }).select("id").single();
+    await tgSendMessage(chatId, ins.error ? `❌ ${ins.error.message}` : `✅ Added template <code>${ins.data!.id.slice(0, 8)}</code>`, { reply_markup: mainMenu() });
+    return true;
+  }
+
+  if (replyToText.includes(TAG.edittpl)) {
+    const m = replyToText.match(/‹edittpl›:([0-9a-f]{4,})/);
+    const idPrefix = m?.[1];
+    if (!idPrefix) return false;
+    const parts = payload.split("|").map((s) => s.trim());
+    const [image_url, ...rest] = parts;
+    const prompt = rest.join(" | ");
+    const patch: Record<string, unknown> = {};
+    if (image_url && image_url !== "-") patch.preview_url = image_url;
+    if (prompt && prompt !== "-") patch.prompt = prompt;
+    if (!Object.keys(patch).length) {
+      await tgSendMessage(chatId, "Nothing to update.");
+      return true;
+    }
+    const { data: rows } = await db.from("templates").select("id").like("id", `${idPrefix}%`).limit(1);
+    if (!rows?.[0]) {
+      await tgSendMessage(chatId, "Template not found.");
+      return true;
+    }
+    const up = await (db.from("templates") as any).update(patch).eq("id", rows[0].id);
+    await tgSendMessage(chatId, up.error ? `❌ ${up.error.message}` : `✅ Updated`, { reply_markup: mainMenu() });
     return true;
   }
 
