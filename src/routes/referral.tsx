@@ -59,6 +59,7 @@ function ReferralPage() {
     });
   }
   function share() {
+    if (!link) return;
     const tg = getTg();
     const url = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent("Join me on Gram AI — unlimited AI right inside Telegram.")}`;
     tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url, "_blank");
