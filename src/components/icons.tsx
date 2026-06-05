@@ -48,8 +48,10 @@ export const IconReferral = (p: P) => (
 
 export const IconPricing = (p: P) => (
   <svg {...base} {...p}>
-    <path d="M12.6 3.4 20 10.8a1.4 1.4 0 0 1 0 2L13 19.8a1.4 1.4 0 0 1-2 0L3.4 12.2a1.4 1.4 0 0 1-.4-1.1l.5-6.2A1.4 1.4 0 0 1 4.9 3.6l6.2-.5a1.4 1.4 0 0 1 1.5.3Z" />
-    <circle cx="8.4" cy="8.4" r="1.5" fill="currentColor" stroke="none" />
+    <path d="M4 9.5 7.5 6l4.5 4 4.5-4L20 9.5 18.4 18a1.4 1.4 0 0 1-1.4 1.2H7a1.4 1.4 0 0 1-1.4-1.2L4 9.5Z" />
+    <circle cx="4" cy="9.5" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="20" cy="9.5" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="5.6" r="1.2" fill="currentColor" stroke="none" />
   </svg>
 );
 
