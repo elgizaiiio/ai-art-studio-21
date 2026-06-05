@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Use Vercel preset when building for Vercel (NITRO_PRESET=vercel),
+  // otherwise fall back to Cloudflare for Lovable hosting.
+  nitro: {
+    preset: process.env.NITRO_PRESET ?? "cloudflare-module",
+  },
 });
