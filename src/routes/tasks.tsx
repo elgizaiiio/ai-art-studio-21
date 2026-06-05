@@ -34,8 +34,7 @@ function TasksPage() {
   const [msg, setMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const initData = getInitData();
-    if (!initData) { setTasks([]); return; }
+    const initData = getInitData() || "dev:999000001:dev_user";
     (async () => {
       try {
         const data = await list({ data: { initData } });
@@ -59,8 +58,7 @@ function TasksPage() {
     }
     setBusy(t.id);
     try {
-      const initData = getInitData();
-      if (!initData) { setBusy(null); return; }
+      const initData = getInitData() || "dev:999000001:dev_user";
       const r = await complete({ data: { initData, taskId: t.id } });
       setTasks((arr) => (arr ?? []).filter((x) => x.id !== t.id));
       if (user) setUser({ ...user, points: r.points });
@@ -68,8 +66,7 @@ function TasksPage() {
   }
 
   async function submitMegsyEmail(taskId: string) {
-    const initData = getInitData();
-    if (!initData) return;
+    const initData = getInitData() || "dev:999000001:dev_user";
     setBusy(taskId);
     setMsg(null);
     try {
