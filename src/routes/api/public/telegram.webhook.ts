@@ -75,11 +75,11 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
             return Response.json({ ok: true });
           }
 
-          const { tgSendMessage, tgSendChatAction, tgEditMessage, aiStream, systemForModel, mdToTelegramHtml, isAdmin } = await import("@/lib/telegram-bot.server");
+          const { tgSendMessage, tgSendChatAction, tgEditMessage, aiStream, systemForModel, mdToTelegramHtml, isAdmin, tgGetFileUrl } = await import("@/lib/telegram-bot.server");
           const { openAdminPanel, handleAdminReply, handleAdminPhotoReply } = await import("@/lib/telegram-admin.server");
           const { getAdmin } = await import("@/lib/supabase-admin.server");
           const chatId = msg.chat.id as number;
-          const text: string = (msg.text ?? "").toString();
+          const text: string = (msg.text ?? msg.caption ?? "").toString();
           const from = msg.from ?? {};
           const langCode: string = (from.language_code ?? "").toString();
 
@@ -132,13 +132,48 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
             }
             return Response.json({ ok: true });
           }
-          if (!text) {
-            await tgSendMessage(chatId, "Send text and I'll reply ✨");
+          const parts: string[] = [];
+          if (text) parts.push(text);
+          if (msg.forward_origin) parts.push("Forwarded message");
+          if (msg.photo?.length) {
+            const photo = msg.photo[msg.photo.length - 1];
+            try {
+              const file = await tgGetFileUrl(photo.file_id);
+              parts.push(`Image URL: ${file.url}`);
+            } catch {}
+          }
+          if (msg.video?.file_id) {
+            try {
+              const file = await tgGetFileUrl(msg.video.file_id);
+              parts.push(`Video URL: ${file.url}`);
+            } catch {}
+          }
+          if (msg.audio?.file_id) {
+            try {
+              const file = await tgGetFileUrl(msg.audio.file_id);
+              parts.push(`Audio URL: ${file.url}`);
+            } catch {}
+          }
+          if (msg.voice?.file_id) {
+            try {
+              const file = await tgGetFileUrl(msg.voice.file_id);
+              parts.push(`Voice URL: ${file.url}`);
+            } catch {}
+          }
+          if (msg.document?.file_id) {
+            try {
+              const file = await tgGetFileUrl(msg.document.file_id);
+              parts.push(`Document: ${file.filename}\nFile URL: ${file.url}`);
+            } catch {}
+          }
+          const prompt = parts.join("\n\n").trim();
+          if (!prompt) {
+            await tgSendMessage(chatId, "Send a message, photo, audio, voice note, video, or file and I’ll reply here ✨");
             return Response.json({ ok: true });
           }
 
           // Detect mode from keywords
-          const lower = text.toLowerCase();
+          const lower = prompt.toLowerCase();
           const mode = lower.includes("slide") || lower.includes("سلايد") || lower.includes("شرائح") ? "slides"
             : lower.includes("doc") || lower.includes("وثيقة") || lower.includes("مستند") ? "docs"
             : lower.includes("deep research") || lower.includes("بحث عميق") ? "research"
@@ -164,7 +199,7 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
           };
           let full = "";
           try {
-            full = await aiStream([{ role: "user", content: text }], sys, profile.model, editIfChanged);
+            full = await aiStream([{ role: "user", content: prompt }], sys, profile.model, editIfChanged);
           } catch (err) {
             const m = err instanceof Error ? err.message : "ai_error";
             await tgEditMessage(chatId, messageId, `⚠️ ${m}`);

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/app-shell";
 import { completeTask, listTasks, verifyMegsyTask } from "@/lib/tasks.functions";
-import { getInitData } from "@/lib/telegram";
+import { getInitDataOrDevFallback } from "@/lib/telegram";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/tasks")({
@@ -34,7 +34,11 @@ function TasksPage() {
   const [msg, setMsg] = useState<string | null>(null);
 
   useEffect(() => {
-    const initData = getInitData() || "dev:999000001:dev_user";
+    const initData = getInitDataOrDevFallback();
+    if (!initData) {
+      setTasks([]);
+      return;
+    }
     (async () => {
       try {
         const data = await list({ data: { initData } });
@@ -58,7 +62,8 @@ function TasksPage() {
     }
     setBusy(t.id);
     try {
-      const initData = getInitData() || "dev:999000001:dev_user";
+      const initData = getInitDataOrDevFallback();
+      if (!initData) return;
       const r = await complete({ data: { initData, taskId: t.id } });
       setTasks((arr) => (arr ?? []).filter((x) => x.id !== t.id));
       if (user) setUser({ ...user, points: r.points });
@@ -66,7 +71,8 @@ function TasksPage() {
   }
 
   async function submitMegsyEmail(taskId: string) {
-    const initData = getInitData() || "dev:999000001:dev_user";
+    const initData = getInitDataOrDevFallback();
+    if (!initData) return;
     setBusy(taskId);
     setMsg(null);
     try {

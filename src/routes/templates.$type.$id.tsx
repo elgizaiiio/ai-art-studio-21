@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/app-shell";
-import { IconBack, IconSpark } from "@/components/icons";
+import { IconSpark } from "@/components/icons";
 import { getTemplate } from "@/lib/referral.functions";
 
 export const Route = createFileRoute("/templates/$type/$id")({
@@ -28,9 +28,6 @@ function TemplateDetail() {
   return (
     <AppShell hideNav>
       <div className="px-3 pt-3 flex items-center gap-2">
-        <button onClick={() => navigate({ to: "/templates/$type", params: { type } })} className="size-10 rounded-2xl bg-secondary grid place-items-center">
-          <IconBack className="size-5" />
-        </button>
         <h1 className="text-lg font-semibold">Template</h1>
       </div>
 

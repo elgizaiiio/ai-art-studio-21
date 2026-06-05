@@ -71,6 +71,24 @@ export async function tgSendVideo(chatId: number | string, videoUrl: string, cap
   return res.json().catch(() => ({}));
 }
 
+export async function tgSendAudio(chatId: number | string, audioUrl: string, caption?: string, opts: Record<string, unknown> = {}) {
+  const res = await fetch(`${API}/bot${token()}/sendAudio`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, audio: audioUrl, caption, ...opts }),
+  });
+  return res.json().catch(() => ({}));
+}
+
+export async function tgSendVoice(chatId: number | string, voiceUrl: string, caption?: string, opts: Record<string, unknown> = {}) {
+  const res = await fetch(`${API}/bot${token()}/sendVoice`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, voice: voiceUrl, caption, ...opts }),
+  });
+  return res.json().catch(() => ({}));
+}
+
 // Get chat member status (subscription verification).
 export async function tgGetChatMember(chatId: string | number, userId: number): Promise<string | null> {
   try {
@@ -170,6 +188,36 @@ export async function tgGetFileBytes(fileId: string): Promise<{ bytes: ArrayBuff
 
   return {
     bytes: await fileRes.arrayBuffer(),
+    filename,
+    mime,
+  };
+}
+
+export async function tgGetFileUrl(fileId: string): Promise<{ url: string; filename: string; mime: string }> {
+  const metaRes = await fetch(`${API}/bot${token()}/getFile`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ file_id: fileId }),
+  });
+  const meta = await metaRes.json().catch(() => ({}));
+  const filePath = meta?.result?.file_path as string | undefined;
+  if (!metaRes.ok || !meta?.ok || !filePath) {
+    throw new Error(`tg_get_file_failed:${metaRes.status}:${JSON.stringify(meta)}`);
+  }
+  const filename = filePath.split("/").pop() || fileId;
+  const ext = filename.split(".").pop()?.toLowerCase();
+  const mime =
+    ext === "png" ? "image/png" :
+    ext === "webp" ? "image/webp" :
+    ext === "gif" ? "image/gif" :
+    ext === "mp4" ? "video/mp4" :
+    ext === "mp3" ? "audio/mpeg" :
+    ext === "ogg" ? "audio/ogg" :
+    ext === "wav" ? "audio/wav" :
+    ext === "pdf" ? "application/pdf" :
+    "application/octet-stream";
+  return {
+    url: `${API}/file/bot${token()}/${filePath}`,
     filename,
     mime,
   };

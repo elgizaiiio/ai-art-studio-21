@@ -28,7 +28,7 @@ const BOT_USERNAME = "Gramaiibot";
 
 function ReferralPage() {
   const stats = useServerFn(getReferralStats);
-  const [data, setData] = useState<{ telegramId: string; referrals: number; pointsEarned: number; usdEarned: number } | null>(null);
+  const [data, setData] = useState<{ telegramId: string; referralCode: string | null; referrals: number; pointsEarned: number; usdEarned: number } | null>(null);
   const [copied, setCopied] = useState(false);
   const [tgFallback, setTgFallback] = useState(false);
 
@@ -47,9 +47,10 @@ function ReferralPage() {
     })();
   }, [stats]);
 
-  const link = data
-    ? `https://t.me/${BOT_USERNAME}/app?startapp=${data.telegramId}`
-    : `https://t.me/${BOT_USERNAME}/app`;
+  const startValue = data?.referralCode || data?.telegramId;
+  const link = startValue
+    ? `https://t.me/${BOT_USERNAME}/app?startapp=${encodeURIComponent(startValue)}`
+    : null;
 
   function copy() {
     if (!link) return;
@@ -58,6 +59,7 @@ function ReferralPage() {
     });
   }
   function share() {
+    if (!link) return;
     const tg = getTg();
     const url = `https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent("Join me on Gram AI — unlimited AI right inside Telegram.")}`;
     tg?.openTelegramLink ? tg.openTelegramLink(url) : window.open(url, "_blank");
@@ -124,7 +126,7 @@ function ReferralPage() {
         <div className="rounded-3xl bg-white/6 border border-white/12 p-4">
           <div className="text-[11px] uppercase tracking-wide text-white/50 font-medium">Your invite link</div>
           <div className="mt-2 flex items-center gap-2 rounded-2xl bg-white/8 border border-white/10 pl-3 pr-1.5 py-1.5">
-            <div className="flex-1 truncate text-[12.5px] text-white/85">{link || "Generating…"}</div>
+            <div className="flex-1 truncate text-[12.5px] text-white/85">{link || (tgFallback ? "Open inside Telegram" : "Generating…")}</div>
             <button
               onClick={copy}
               aria-label="Copy link"

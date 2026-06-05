@@ -15,7 +15,7 @@ async function deliverToTelegram(
     const caption = `🪄 ${prompt.slice(0, 200)}`;
     if (kind === "image") await tg.tgSendPhoto(telegramId, url, caption);
     else if (kind === "video") await tg.tgSendVideo(telegramId, url, caption);
-    else await tg.tgSendMessage(telegramId, `🎵 ${caption}\n${url}`);
+    else await tg.tgSendAudio(telegramId, url, caption);
   } catch {}
 }
 

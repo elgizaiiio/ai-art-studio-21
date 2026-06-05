@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/app-shell";
-import { IconBack, IconImage, IconVideo } from "@/components/icons";
+import { IconImage, IconVideo } from "@/components/icons";
 import { listTemplates } from "@/lib/referral.functions";
 
 export const Route = createFileRoute("/templates/$type")({
@@ -28,9 +28,6 @@ function TemplatesPage() {
   return (
     <AppShell>
       <div className="px-3 pt-3 flex items-center gap-2">
-        <button onClick={() => navigate({ to: "/" })} className="size-10 rounded-2xl bg-secondary grid place-items-center">
-          <IconBack className="size-5" />
-        </button>
         <div className="flex items-center gap-2">
           {t === "image" ? <IconImage className="size-5 text-primary" /> : <IconVideo className="size-5 text-primary" />}
           <h1 className="text-lg font-semibold">{t === "image" ? "Image" : "Video"} templates</h1>

@@ -14,6 +14,7 @@ export const getReferralStats = createServerFn({ method: "POST" })
     const PER_REFERRAL = 3;
     return {
       telegramId: String(user.telegram_id),
+      referralCode: user.referral_code ?? null,
       referrals: count,
       pointsEarned: count * PER_REFERRAL,
       usdEarned: +(count * PER_REFERRAL * 0.01).toFixed(2),
