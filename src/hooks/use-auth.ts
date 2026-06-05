@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { authMe } from "@/lib/auth.functions";
-import { getInitData, initTelegram } from "@/lib/telegram";
+import { getInitDataOrDevFallback, initTelegram } from "@/lib/telegram";
 
 export type AuthedUser = {
   id: string;
@@ -25,7 +25,11 @@ export function useAuth() {
   useEffect(() => {
     let cancelled = false;
     initTelegram();
-    const initData = getInitData() || "dev:999000001:dev_user";
+    const initData = getInitDataOrDevFallback();
+    if (!initData) {
+      setLoading(false);
+      return () => { cancelled = true; };
+    }
     me({ data: { initData } })
       .then((u) => {
         if (cancelled) return;
