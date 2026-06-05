@@ -22,8 +22,7 @@ function TemplateDetail() {
 
   function use() {
     if (!tpl) return;
-    sessionStorage.setItem("pending_prompt", tpl.prompt);
-    navigate({ to: "/" });
+    navigate({ to: "/", search: { prompt: tpl.prompt } as never });
   }
 
   return (
