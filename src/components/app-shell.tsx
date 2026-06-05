@@ -1,13 +1,13 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Sparkles, ListChecks, Crown, Users } from "lucide-react";
+import { House, SquareCheck, Sparkles, UserRoundPlus } from "lucide-react";
 import { DesktopSidebar } from "./desktop-shell";
 import type { ReactNode } from "react";
 
 const tabs = [
-  { to: "/", label: "Home", icon: Sparkles },
-  { to: "/tasks", label: "Tasks", icon: ListChecks },
-  { to: "/pricing", label: "Pro", icon: Crown },
-  { to: "/referral", label: "Invite", icon: Users },
+  { to: "/", label: "Home", icon: House },
+  { to: "/tasks", label: "Tasks", icon: SquareCheck },
+  { to: "/pricing", label: "Pro", icon: Sparkles },
+  { to: "/referral", label: "Invite", icon: UserRoundPlus },
 ] as const;
 
 export function BottomNav() {
@@ -25,8 +25,11 @@ export function BottomNav() {
                     to={to}
                     className={`flex flex-col items-center justify-center gap-0.5 rounded-full px-4 py-2 transition-colors ${active ? "bg-white/8" : ""}`}
                   >
-                    <Icon className={`size-[22px] ${active ? "text-primary" : "text-white/85"}`} />
-                    <span className={`text-[11px] font-medium ${active ? "text-primary" : "text-white/75"}`}>{label}</span>
+                    <Icon
+                      strokeWidth={active ? 2.2 : 1.7}
+                      className={`size-[23px] ${active ? "text-primary fill-primary/15" : "text-white/85"}`}
+                    />
+                    <span className={`text-[10.5px] font-medium tracking-tight ${active ? "text-primary" : "text-white/70"}`}>{label}</span>
                   </Link>
                 </li>
               );
