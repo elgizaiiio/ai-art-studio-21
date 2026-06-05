@@ -18,6 +18,14 @@ export type VerifiedInit = {
 
 const DEV_MODE = process.env.NODE_ENV !== "production";
 
+function makeReferralCode(user: TgInitUser) {
+  const base = (user.username || user.first_name || `user${user.id}`)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "")
+    .slice(0, 12) || `user${user.id}`;
+  return `${base}${String(user.id).slice(-6)}`;
+}
+
 export function verifyInitData(initData: string): VerifiedInit {
   if (!initData) throw new Error("missing_init_data");
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -63,6 +71,7 @@ export async function getOrCreateUser(initData: string) {
     if (user.last_name && existing.data.last_name !== user.last_name) patch.last_name = user.last_name;
     if (user.photo_url && existing.data.photo_url !== user.photo_url) patch.photo_url = user.photo_url;
     if (user.language_code && existing.data.language_code !== user.language_code) patch.language_code = user.language_code;
+    if (!existing.data.referral_code) patch.referral_code = makeReferralCode(user);
     if (Object.keys(patch).length) {
       const updated = await db.from("users").update(patch).eq("id", existing.data.id).select("*").maybeSingle();
       if (updated.data) return { user: updated.data, isNew: false };
@@ -73,10 +82,16 @@ export async function getOrCreateUser(initData: string) {
   // Resolve referrer from start_param
   let referredBy: string | null = null;
   if (start_param) {
-    const refTgId = Number(start_param);
-    if (!Number.isNaN(refTgId) && refTgId !== user.id) {
-      const r = await db.from("users").select("id").eq("telegram_id", refTgId).maybeSingle();
-      if (r.data) referredBy = (r.data as { id: string }).id;
+    const referralParam = start_param.trim();
+    const byCode = await db.from("users").select("id, telegram_id").eq("referral_code", referralParam).maybeSingle();
+    if (byCode.data && byCode.data.telegram_id !== user.id) {
+      referredBy = (byCode.data as { id: string }).id;
+    } else {
+      const refTgId = Number(referralParam);
+      if (!Number.isNaN(refTgId) && refTgId !== user.id) {
+        const r = await db.from("users").select("id").eq("telegram_id", refTgId).maybeSingle();
+        if (r.data) referredBy = (r.data as { id: string }).id;
+      }
     }
   }
 
@@ -87,6 +102,7 @@ export async function getOrCreateUser(initData: string) {
     last_name: user.last_name ?? null,
     photo_url: user.photo_url ?? null,
     language_code: user.language_code ?? null,
+    referral_code: makeReferralCode(user),
     referred_by: referredBy,
     points: 50,
   }).select("*").single();
