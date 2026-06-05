@@ -192,6 +192,11 @@ function splitTemplatePayload(payload: string) {
   return payload.split("|").map((s) => s.trim());
 }
 
+function makeTemplateTitle(prompt: string) {
+  const clean = prompt.replace(/\s+/g, " ").trim();
+  return clean.slice(0, 48) || "Image template";
+}
+
 async function uploadTelegramPhotoToTemplateBucket(fileId: string) {
   const db = getAdmin();
   const { bytes, filename, mime } = await tgGetFileBytes(fileId);
@@ -225,7 +230,7 @@ export async function handleAdminCallback(cb: any): Promise<void> {
   if (data === "a:addtpl")
     return void askForReply(
       chatId,
-      "<b>➕ Add template</b>\nSend a <b>photo</b> as reply with caption: <code>type | title | prompt</code>\nOr send text only: <code>type | title | image_url | prompt</code>\n<i>type</i> = <code>image</code> or <code>video</code>.",
+      "<b>➕ Add image template</b>\nSend a <b>photo</b> as reply with caption = the prompt فقط.\nOr send text only: <code>prompt | image_url</code>",
       TAG.addtpl,
     );
   if (data === "a:addtask")
@@ -280,7 +285,7 @@ export async function handleAdminCallback(cb: any): Promise<void> {
     const idPrefix = data.slice("a:tple:".length);
     return void askForReply(
       chatId,
-      `<b>✏️ Edit template</b> <code>${idPrefix}</code>\nReply with text: <code>image_url | prompt</code> or send a <b>new photo</b> with caption = new prompt (or <code>-</code> to keep prompt).`,
+      `<b>✏️ Edit template</b> <code>${idPrefix}</code>\nReply with <code>prompt</code> فقط، أو <code>prompt | image_url</code>.\nOr send a <b>new photo</b> with caption = new prompt (or <code>-</code> to keep prompt).`,
       `${TAG.edittpl}:${idPrefix}`,
     );
   }
@@ -311,18 +316,14 @@ export async function handleAdminReply(chatId: number, replyToText: string, payl
 
   if (replyToText.includes(TAG.addtpl)) {
     const parts = splitTemplatePayload(payload);
-    if (parts.length < 4) {
-      await tgSendMessage(chatId, "❌ Need: type | title | image_url | prompt");
+    if (parts.length < 2) {
+      await tgSendMessage(chatId, "❌ Need: <code>prompt | image_url</code>");
       return true;
     }
-    const [type, title, image_url, ...rest] = parts;
-    const prompt = rest.join(" | ");
-    if (!["image", "video", "music"].includes(type)) {
-      await tgSendMessage(chatId, "❌ type must be image, video, or music");
-      return true;
-    }
+    const [prompt, image_url] = parts;
     const ins = await db.from("templates").insert({
-      type, title,
+      type: "image",
+      title: makeTemplateTitle(prompt),
       preview_url: image_url || null,
       prompt,
       is_active: true,
@@ -335,12 +336,15 @@ export async function handleAdminReply(chatId: number, replyToText: string, payl
     const m = replyToText.match(/‹edittpl›:([0-9a-f]{4,})/);
     const idPrefix = m?.[1];
     if (!idPrefix) return false;
-    const parts = payload.split("|").map((s) => s.trim());
-    const [image_url, ...rest] = parts;
-    const prompt = rest.join(" | ");
+    const parts = splitTemplatePayload(payload);
+    const prompt = parts[0] ?? "";
+    const image_url = parts[1] ?? "";
     const patch: Record<string, unknown> = {};
     if (image_url && image_url !== "-") patch.preview_url = image_url;
-    if (prompt && prompt !== "-") patch.prompt = prompt;
+    if (prompt && prompt !== "-") {
+      patch.prompt = prompt;
+      patch.title = makeTemplateTitle(prompt);
+    }
     if (!Object.keys(patch).length) {
       await tgSendMessage(chatId, "Nothing to update.");
       return true;
@@ -387,26 +391,16 @@ export async function handleAdminPhotoReply(chatId: number, replyToText: string,
   if (!fileId) return false;
 
   if (replyToText.includes(TAG.addtpl)) {
-    const parts = splitTemplatePayload(caption ?? "");
-    if (parts.length < 3) {
-      await tgSendMessage(chatId, "❌ Send the photo with caption: <code>type | title | prompt</code>");
-      return true;
-    }
-    const [type, title, ...rest] = parts;
-    const prompt = rest.join(" | ");
+    const prompt = (caption ?? "").trim();
     if (!prompt) {
-      await tgSendMessage(chatId, "❌ Prompt is required.");
-      return true;
-    }
-    if (!["image", "video", "music"].includes(type)) {
-      await tgSendMessage(chatId, "❌ type must be image, video, or music");
+      await tgSendMessage(chatId, "❌ Send the photo with the prompt in the caption.");
       return true;
     }
     try {
       const previewUrl = await uploadTelegramPhotoToTemplateBucket(fileId);
       const ins = await db.from("templates").insert({
-        type,
-        title,
+        type: "image",
+        title: makeTemplateTitle(prompt),
         preview_url: previewUrl,
         prompt,
         is_active: true,
@@ -431,7 +425,10 @@ export async function handleAdminPhotoReply(chatId: number, replyToText: string,
         return true;
       }
       const patch: Record<string, unknown> = { preview_url: previewUrl };
-      if (prompt && prompt !== "-") patch.prompt = prompt;
+      if (prompt && prompt !== "-") {
+        patch.prompt = prompt;
+        patch.title = makeTemplateTitle(prompt);
+      }
       const up = await (db.from("templates") as any).update(patch).eq("id", rows[0].id);
       await tgSendMessage(chatId, up.error ? `❌ ${up.error.message}` : "✅ Updated", { reply_markup: mainMenu() });
     } catch (error) {
