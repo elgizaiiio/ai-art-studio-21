@@ -60,7 +60,6 @@ export const MODELS: ModelEntry[] = [
     providerModel: "gemini-2.5-flash-image",
     cost: 5,
     unlimitedForSubs: true,
-    badge: "Google",
   },
   {
     id: "leo-nano-banana-pro",
@@ -70,7 +69,6 @@ export const MODELS: ModelEntry[] = [
     providerModel: "gemini-image-2",
     cost: 10,
     unlimitedForSubs: true,
-    badge: "Pro",
   },
   {
     id: "leo-flux-2-pro",
@@ -80,7 +78,6 @@ export const MODELS: ModelEntry[] = [
     providerModel: "flux-pro-2.0",
     cost: 10,
     unlimitedForSubs: true,
-    badge: "BFL",
   },
   {
     id: "leo-seedream-4-5",
@@ -90,7 +87,6 @@ export const MODELS: ModelEntry[] = [
     providerModel: "seedream-4.5",
     cost: 8,
     unlimitedForSubs: true,
-    badge: "ByteDance",
   },
   {
     id: "leo-gpt-image-2",
@@ -100,7 +96,6 @@ export const MODELS: ModelEntry[] = [
     providerModel: "gpt-image-2",
     cost: 10,
     unlimitedForSubs: true,
-    badge: "OpenAI",
   },
   {
     id: "leo-lucid-origin",
@@ -121,7 +116,6 @@ export const MODELS: ModelEntry[] = [
     providerModel: "veo-3.1",
     cost: 80,
     unlimitedForSubs: true,
-    badge: "Google",
   },
   {
     id: "leo-veo-3-0",
@@ -131,7 +125,6 @@ export const MODELS: ModelEntry[] = [
     providerModel: "veo-3.0",
     cost: 60,
     unlimitedForSubs: true,
-    badge: "Google",
   },
   {
     id: "leo-kling-2-6",
@@ -159,7 +152,6 @@ export const MODELS: ModelEntry[] = [
     providerModel: "seedance-2.0",
     cost: 50,
     unlimitedForSubs: true,
-    badge: "ByteDance",
   },
   {
     id: "leo-seedance-2-fast",
