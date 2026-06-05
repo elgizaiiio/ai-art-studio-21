@@ -1,7 +1,8 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { IconHome, IconTasks, IconPricing, IconReferral } from "./icons";
 import { DesktopSidebar } from "./desktop-shell";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { getTg } from "@/lib/telegram";
 
 const tabs = [
   { to: "/", label: "Home", icon: IconHome },
@@ -43,6 +44,26 @@ export function BottomNav() {
 
 export function AppShell({ children, hideNav = false }: { children: ReactNode; hideNav?: boolean }) {
   const { location } = useRouterState();
+  const router = useRouter();
+  useEffect(() => {
+    const tg = getTg();
+    if (!tg) return;
+    const isRoot = location.pathname === "/";
+    const handler = () => {
+      try { router.history.back(); } catch { router.navigate({ to: "/" }); }
+    };
+    try {
+      if (isRoot) {
+        tg.BackButton.hide();
+      } else {
+        tg.BackButton.onClick(handler);
+        tg.BackButton.show();
+      }
+    } catch {}
+    return () => {
+      try { tg.BackButton.offClick(handler); } catch {}
+    };
+  }, [location.pathname, router]);
   return (
     <div className="relative min-h-screen lg:pl-[260px]">
       <DesktopSidebar />
