@@ -56,7 +56,19 @@ export async function getOrCreateUser(initData: string) {
   const db = getAdmin();
 
   const existing = await db.from("users").select("*").eq("telegram_id", user.id).maybeSingle();
-  if (existing.data) return { user: existing.data, isNew: false };
+  if (existing.data) {
+    const patch: Record<string, string | null> = {};
+    if (user.username && existing.data.username !== user.username) patch.username = user.username;
+    if (user.first_name && existing.data.first_name !== user.first_name) patch.first_name = user.first_name;
+    if (user.last_name && existing.data.last_name !== user.last_name) patch.last_name = user.last_name;
+    if (user.photo_url && existing.data.photo_url !== user.photo_url) patch.photo_url = user.photo_url;
+    if (user.language_code && existing.data.language_code !== user.language_code) patch.language_code = user.language_code;
+    if (Object.keys(patch).length) {
+      const updated = await db.from("users").update(patch).eq("id", existing.data.id).select("*").maybeSingle();
+      if (updated.data) return { user: updated.data, isNew: false };
+    }
+    return { user: existing.data, isNew: false };
+  }
 
   // Resolve referrer from start_param
   let referredBy: string | null = null;
@@ -102,6 +114,6 @@ export async function requireUser(initData: string) {
   return user as {
     id: string; telegram_id: number; username: string | null; first_name: string | null;
     last_name: string | null; photo_url: string | null; points: number; total_referrals: number;
-    referred_by: string | null; ton_wallet: string | null;
+    referred_by: string | null; ton_wallet: string | null; referral_code?: string | null;
   };
 }
