@@ -143,6 +143,38 @@ export async function tgSendPhotoBytes(
   return j.result;
 }
 
+export async function tgGetFileBytes(fileId: string): Promise<{ bytes: ArrayBuffer; filename: string; mime: string }> {
+  const metaRes = await fetch(`${API}/bot${token()}/getFile`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ file_id: fileId }),
+  });
+  const meta = await metaRes.json().catch(() => ({}));
+  const filePath = meta?.result?.file_path as string | undefined;
+  if (!metaRes.ok || !meta?.ok || !filePath) {
+    throw new Error(`tg_get_file_failed:${metaRes.status}:${JSON.stringify(meta)}`);
+  }
+
+  const fileRes = await fetch(`${API}/file/bot${token()}/${filePath}`);
+  if (!fileRes.ok) {
+    throw new Error(`tg_download_file_failed:${fileRes.status}`);
+  }
+
+  const filename = filePath.split("/").pop() || `${fileId}.jpg`;
+  const ext = filename.split(".").pop()?.toLowerCase();
+  const mime =
+    ext === "png" ? "image/png" :
+    ext === "webp" ? "image/webp" :
+    ext === "gif" ? "image/gif" :
+    "image/jpeg";
+
+  return {
+    bytes: await fileRes.arrayBuffer(),
+    filename,
+    mime,
+  };
+}
+
 // Non-streaming completion via Lovable AI Gateway
 export async function aiComplete(
   messages: Array<{ role: string; content: string }>,
