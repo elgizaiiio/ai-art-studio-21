@@ -5,7 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/app-shell";
 import { IconCheck } from "@/components/icons";
 import { createDodoCheckout, createStarsInvoice, getTonPaymentInfo, verifyTonPayment } from "@/lib/payments.functions";
-import { getInitData } from "@/lib/telegram";
+import { getInitDataOrDevFallback } from "@/lib/telegram";
 import { TonConnectUIProvider, useTonConnectUI, useTonWallet } from "@tonconnect/ui-react";
 
 const searchSchema = z.object({
@@ -84,7 +84,8 @@ function CheckoutPage() {
     setError(null);
     setProcessing(true);
     try {
-      const initData = getInitData() || "dev:999000001:dev_user";
+        const initData = getInitDataOrDevFallback();
+        if (!initData) throw new Error("Open this checkout inside Telegram.");
       if (method === "card") {
         // ALLOW PAYMENT — Dodo Payments checkout
         const { url } = await dodoFn({ data: { plan, cycle, initData } });

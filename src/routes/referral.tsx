@@ -50,7 +50,7 @@ function ReferralPage() {
   const startValue = data?.referralCode || data?.telegramId;
   const link = startValue
     ? `https://t.me/${BOT_USERNAME}/app?startapp=${encodeURIComponent(startValue)}`
-    : `https://t.me/${BOT_USERNAME}/app`;
+    : null;
 
   function copy() {
     if (!link) return;
@@ -125,7 +125,7 @@ function ReferralPage() {
         <div className="rounded-3xl bg-white/6 border border-white/12 p-4">
           <div className="text-[11px] uppercase tracking-wide text-white/50 font-medium">Your invite link</div>
           <div className="mt-2 flex items-center gap-2 rounded-2xl bg-white/8 border border-white/10 pl-3 pr-1.5 py-1.5">
-            <div className="flex-1 truncate text-[12.5px] text-white/85">{link || "Generating…"}</div>
+            <div className="flex-1 truncate text-[12.5px] text-white/85">{link || (tgFallback ? "Open inside Telegram" : "Generating…")}</div>
             <button
               onClick={copy}
               aria-label="Copy link"
