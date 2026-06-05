@@ -9,38 +9,247 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as ReferralRouteImport } from './routes/referral'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TemplatesTypeRouteImport } from './routes/templates.$type'
+import { Route as ApiSendToBotRouteImport } from './routes/api/send-to-bot'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as TemplatesTypeIdRouteImport } from './routes/templates.$type.$id'
+import { Route as ApiPublicTonconnectManifestRouteImport } from './routes/api/public/tonconnect-manifest'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram.webhook'
+import { Route as ApiPublicDodoWebhookRouteImport } from './routes/api/public/dodo.webhook'
+import { Route as ApiPublicBrandFileRouteImport } from './routes/api/public/brand.$file'
 
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferralRoute = ReferralRouteImport.update({
+  id: '/referral',
+  path: '/referral',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplatesTypeRoute = TemplatesTypeRouteImport.update({
+  id: '/templates/$type',
+  path: '/templates/$type',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSendToBotRoute = ApiSendToBotRouteImport.update({
+  id: '/api/send-to-bot',
+  path: '/api/send-to-bot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesTypeIdRoute = TemplatesTypeIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => TemplatesTypeRoute,
+} as any)
+const ApiPublicTonconnectManifestRoute =
+  ApiPublicTonconnectManifestRouteImport.update({
+    id: '/api/public/tonconnect-manifest',
+    path: '/api/public/tonconnect-manifest',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram/webhook',
+    path: '/api/public/telegram/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicDodoWebhookRoute = ApiPublicDodoWebhookRouteImport.update({
+  id: '/api/public/dodo/webhook',
+  path: '/api/public/dodo/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicBrandFileRoute = ApiPublicBrandFileRouteImport.update({
+  id: '/api/public/brand/$file',
+  path: '/api/public/brand/$file',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
+  '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
+  '/referral': typeof ReferralRoute
+  '/tasks': typeof TasksRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/send-to-bot': typeof ApiSendToBotRoute
+  '/templates/$type': typeof TemplatesTypeRouteWithChildren
+  '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
+  '/templates/$type/$id': typeof TemplatesTypeIdRoute
+  '/api/public/brand/$file': typeof ApiPublicBrandFileRoute
+  '/api/public/dodo/webhook': typeof ApiPublicDodoWebhookRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
+  '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
+  '/referral': typeof ReferralRoute
+  '/tasks': typeof TasksRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/send-to-bot': typeof ApiSendToBotRoute
+  '/templates/$type': typeof TemplatesTypeRouteWithChildren
+  '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
+  '/templates/$type/$id': typeof TemplatesTypeIdRoute
+  '/api/public/brand/$file': typeof ApiPublicBrandFileRoute
+  '/api/public/dodo/webhook': typeof ApiPublicDodoWebhookRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/checkout': typeof CheckoutRoute
+  '/pricing': typeof PricingRoute
+  '/profile': typeof ProfileRoute
+  '/referral': typeof ReferralRoute
+  '/tasks': typeof TasksRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/send-to-bot': typeof ApiSendToBotRoute
+  '/templates/$type': typeof TemplatesTypeRouteWithChildren
+  '/api/public/tonconnect-manifest': typeof ApiPublicTonconnectManifestRoute
+  '/templates/$type/$id': typeof TemplatesTypeIdRoute
+  '/api/public/brand/$file': typeof ApiPublicBrandFileRoute
+  '/api/public/dodo/webhook': typeof ApiPublicDodoWebhookRoute
+  '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/checkout'
+    | '/pricing'
+    | '/profile'
+    | '/referral'
+    | '/tasks'
+    | '/api/chat'
+    | '/api/send-to-bot'
+    | '/templates/$type'
+    | '/api/public/tonconnect-manifest'
+    | '/templates/$type/$id'
+    | '/api/public/brand/$file'
+    | '/api/public/dodo/webhook'
+    | '/api/public/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/checkout'
+    | '/pricing'
+    | '/profile'
+    | '/referral'
+    | '/tasks'
+    | '/api/chat'
+    | '/api/send-to-bot'
+    | '/templates/$type'
+    | '/api/public/tonconnect-manifest'
+    | '/templates/$type/$id'
+    | '/api/public/brand/$file'
+    | '/api/public/dodo/webhook'
+    | '/api/public/telegram/webhook'
+  id:
+    | '__root__'
+    | '/'
+    | '/checkout'
+    | '/pricing'
+    | '/profile'
+    | '/referral'
+    | '/tasks'
+    | '/api/chat'
+    | '/api/send-to-bot'
+    | '/templates/$type'
+    | '/api/public/tonconnect-manifest'
+    | '/templates/$type/$id'
+    | '/api/public/brand/$file'
+    | '/api/public/dodo/webhook'
+    | '/api/public/telegram/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CheckoutRoute: typeof CheckoutRoute
+  PricingRoute: typeof PricingRoute
+  ProfileRoute: typeof ProfileRoute
+  ReferralRoute: typeof ReferralRoute
+  TasksRoute: typeof TasksRoute
+  ApiChatRoute: typeof ApiChatRoute
+  ApiSendToBotRoute: typeof ApiSendToBotRoute
+  TemplatesTypeRoute: typeof TemplatesTypeRouteWithChildren
+  ApiPublicTonconnectManifestRoute: typeof ApiPublicTonconnectManifestRoute
+  ApiPublicBrandFileRoute: typeof ApiPublicBrandFileRoute
+  ApiPublicDodoWebhookRoute: typeof ApiPublicDodoWebhookRoute
+  ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/referral': {
+      id: '/referral'
+      path: '/referral'
+      fullPath: '/referral'
+      preLoaderRoute: typeof ReferralRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +257,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/templates/$type': {
+      id: '/templates/$type'
+      path: '/templates/$type'
+      fullPath: '/templates/$type'
+      preLoaderRoute: typeof TemplatesTypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/send-to-bot': {
+      id: '/api/send-to-bot'
+      path: '/api/send-to-bot'
+      fullPath: '/api/send-to-bot'
+      preLoaderRoute: typeof ApiSendToBotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/$type/$id': {
+      id: '/templates/$type/$id'
+      path: '/$id'
+      fullPath: '/templates/$type/$id'
+      preLoaderRoute: typeof TemplatesTypeIdRouteImport
+      parentRoute: typeof TemplatesTypeRoute
+    }
+    '/api/public/tonconnect-manifest': {
+      id: '/api/public/tonconnect-manifest'
+      path: '/api/public/tonconnect-manifest'
+      fullPath: '/api/public/tonconnect-manifest'
+      preLoaderRoute: typeof ApiPublicTonconnectManifestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/webhook': {
+      id: '/api/public/telegram/webhook'
+      path: '/api/public/telegram/webhook'
+      fullPath: '/api/public/telegram/webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/dodo/webhook': {
+      id: '/api/public/dodo/webhook'
+      path: '/api/public/dodo/webhook'
+      fullPath: '/api/public/dodo/webhook'
+      preLoaderRoute: typeof ApiPublicDodoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/brand/$file': {
+      id: '/api/public/brand/$file'
+      path: '/api/public/brand/$file'
+      fullPath: '/api/public/brand/$file'
+      preLoaderRoute: typeof ApiPublicBrandFileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface TemplatesTypeRouteChildren {
+  TemplatesTypeIdRoute: typeof TemplatesTypeIdRoute
+}
+
+const TemplatesTypeRouteChildren: TemplatesTypeRouteChildren = {
+  TemplatesTypeIdRoute: TemplatesTypeIdRoute,
+}
+
+const TemplatesTypeRouteWithChildren = TemplatesTypeRoute._addFileChildren(
+  TemplatesTypeRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CheckoutRoute: CheckoutRoute,
+  PricingRoute: PricingRoute,
+  ProfileRoute: ProfileRoute,
+  ReferralRoute: ReferralRoute,
+  TasksRoute: TasksRoute,
+  ApiChatRoute: ApiChatRoute,
+  ApiSendToBotRoute: ApiSendToBotRoute,
+  TemplatesTypeRoute: TemplatesTypeRouteWithChildren,
+  ApiPublicTonconnectManifestRoute: ApiPublicTonconnectManifestRoute,
+  ApiPublicBrandFileRoute: ApiPublicBrandFileRoute,
+  ApiPublicDodoWebhookRoute: ApiPublicDodoWebhookRoute,
+  ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

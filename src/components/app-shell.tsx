@@ -1,0 +1,56 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import { IconHome, IconTasks, IconReferral, IconPricing } from "./icons";
+import { DesktopSidebar } from "./desktop-shell";
+import type { ReactNode } from "react";
+
+const tabs = [
+  { to: "/", label: "Home", icon: IconHome },
+  { to: "/tasks", label: "Tasks", icon: IconTasks },
+  { to: "/pricing", label: "Pro", icon: IconPricing },
+  { to: "/referral", label: "Referral", icon: IconReferral },
+] as const;
+
+export function BottomNav() {
+  const { location } = useRouterState();
+  return (
+    <nav className="lg:hidden fixed inset-x-0 bottom-0 z-50 tg-safe-pb pointer-events-none">
+      <div className="mx-auto max-w-md px-6 pb-3 flex justify-center">
+        <div className="nav-pill pointer-events-auto rounded-full px-2 py-1.5 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.6)]">
+          <ul className="flex items-center gap-0.5">
+            {tabs.map(({ to, label, icon: Icon }) => {
+              const active = to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
+              return (
+                <li key={to}>
+                  <Link
+                    to={to}
+                    className={`flex flex-col items-center justify-center gap-0.5 rounded-full px-4 py-2 transition-colors ${active ? "bg-white/8" : ""}`}
+                  >
+                    <Icon className={`size-[22px] ${active ? "text-primary" : "text-white/85"}`} />
+                    <span className={`text-[11px] font-medium ${active ? "text-primary" : "text-white/75"}`}>{label}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+export function AppShell({ children, hideNav = false }: { children: ReactNode; hideNav?: boolean }) {
+  const { location } = useRouterState();
+  return (
+    <div className="relative min-h-screen lg:pl-[260px]">
+      <DesktopSidebar />
+      <div className="tg-safe-pt" />
+      <main
+        key={location.pathname}
+        className={`mx-auto max-w-md lg:max-w-3xl lg:pt-6 lg:px-8 animate-page-in ${hideNav ? "" : "pb-28 lg:pb-16"}`}
+      >
+        {children}
+      </main>
+      {!hideNav && <BottomNav />}
+    </div>
+  );
+}
