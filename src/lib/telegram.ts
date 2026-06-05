@@ -56,6 +56,19 @@ function applySafeAreaInsets(tg: TgWebApp) {
 
 export function initTelegram() {
   const tg = getTg();
+  // Block pinch/double-tap zoom on iOS Safari (viewport meta is not enough there).
+  if (typeof document !== "undefined") {
+    const prevent = (e: Event) => e.preventDefault();
+    document.addEventListener("gesturestart", prevent);
+    document.addEventListener("gesturechange", prevent);
+    document.addEventListener("gestureend", prevent);
+    let lastTouch = 0;
+    document.addEventListener("touchend", (e) => {
+      const now = Date.now();
+      if (now - lastTouch <= 350) e.preventDefault();
+      lastTouch = now;
+    }, { passive: false });
+  }
   if (!tg) return null;
   try {
     tg.ready();
