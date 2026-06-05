@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
-import { IconArrowUp, IconChevronDown, IconChipChat, IconChipImage, IconChipMusic, IconChipVideo, IconProfile } from "@/components/icons";
+import { IconArrowUp, IconCheck, IconChevronDown, IconChipChat, IconChipImage, IconChipMusic, IconChipVideo, IconProfile } from "@/components/icons";
 import { useAuth } from "@/hooks/use-auth";
 import { IMAGE_MODELS, VIDEO_MODELS, type ModelEntry } from "@/lib/models-catalog";
 
