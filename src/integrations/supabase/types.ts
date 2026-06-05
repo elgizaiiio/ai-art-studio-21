@@ -206,6 +206,66 @@ export type Database = {
           },
         ]
       }
+      task_verification_requests: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          provider: string | null
+          request_payload: Json | null
+          response_payload: Json | null
+          reward: number
+          status: string
+          task_id: string
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          provider?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          reward?: number
+          status?: string
+          task_id: string
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          provider?: string | null
+          request_payload?: Json | null
+          response_payload?: Json | null
+          reward?: number
+          status?: string
+          task_id?: string
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_verification_requests_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_verification_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           active: boolean
