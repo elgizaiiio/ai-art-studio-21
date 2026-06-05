@@ -7,6 +7,7 @@ import {
   tgAnswerCallback,
   tgEditMessage,
   tgDeleteMessage,
+  tgGetFileBytes,
   MODEL_PROFILES,
 } from "@/lib/telegram-bot.server";
 
@@ -187,6 +188,22 @@ function askForReply(chatId: number, prompt: string, tag: string) {
   });
 }
 
+function splitTemplatePayload(payload: string) {
+  return payload.split("|").map((s) => s.trim());
+}
+
+async function uploadTelegramPhotoToTemplateBucket(fileId: string) {
+  const db = getAdmin();
+  const { bytes, filename, mime } = await tgGetFileBytes(fileId);
+  const path = `telegram-templates/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${filename}`;
+  const upload = await db.storage.from("brand").upload(path, bytes, {
+    contentType: mime,
+    upsert: false,
+  });
+  if (upload.error) throw new Error(upload.error.message);
+  return `/api/public/brand/${path}`;
+}
+
 // ---------- Public entry points ----------
 
 export async function handleAdminCallback(cb: any): Promise<void> {
@@ -274,7 +291,7 @@ export async function handleAdminReply(chatId: number, replyToText: string, payl
   const db = getAdmin();
 
   if (replyToText.includes(TAG.addtask)) {
-    const parts = payload.split("|").map((s) => s.trim());
+    const parts = splitTemplatePayload(payload);
     if (parts.length < 3) {
       await tgSendMessage(chatId, "❌ Need at least: title | link | reward");
       return true;
@@ -292,7 +309,7 @@ export async function handleAdminReply(chatId: number, replyToText: string, payl
   }
 
   if (replyToText.includes(TAG.addtpl)) {
-    const parts = payload.split("|").map((s) => s.trim());
+    const parts = splitTemplatePayload(payload);
     if (parts.length < 4) {
       await tgSendMessage(chatId, "❌ Need: type | title | image_url | prompt");
       return true;
@@ -357,6 +374,68 @@ export async function handleAdminReply(chatId: number, replyToText: string, payl
       catch { fail++; }
     }
     await tgSendMessage(chatId, `📢 Broadcast done.\nSent: <b>${ok}</b> · Failed: <b>${fail}</b>`, { reply_markup: mainMenu() });
+    return true;
+  }
+
+  return false;
+}
+
+export async function handleAdminPhotoReply(chatId: number, replyToText: string, photo: Array<{ file_id: string }>, caption?: string | null): Promise<boolean> {
+  const db = getAdmin();
+  const fileId = photo.at(-1)?.file_id;
+  if (!fileId) return false;
+
+  if (replyToText.includes(TAG.addtpl)) {
+    const parts = splitTemplatePayload(caption ?? "");
+    if (parts.length < 3) {
+      await tgSendMessage(chatId, "❌ Send the photo with caption: <code>type | title | prompt</code>");
+      return true;
+    }
+    const [type, title, ...rest] = parts;
+    const prompt = rest.join(" | ");
+    if (!prompt) {
+      await tgSendMessage(chatId, "❌ Prompt is required.");
+      return true;
+    }
+    if (!["image", "video", "music"].includes(type)) {
+      await tgSendMessage(chatId, "❌ type must be image, video, or music");
+      return true;
+    }
+    try {
+      const previewUrl = await uploadTelegramPhotoToTemplateBucket(fileId);
+      const ins = await db.from("templates").insert({
+        type,
+        title,
+        preview_url: previewUrl,
+        prompt,
+        is_active: true,
+      }).select("id").single();
+      await tgSendMessage(chatId, ins.error ? `❌ ${ins.error.message}` : `✅ Added template <code>${ins.data!.id.slice(0, 8)}</code>`, { reply_markup: mainMenu() });
+    } catch (error) {
+      await tgSendMessage(chatId, `❌ ${error instanceof Error ? error.message : "upload_failed"}`);
+    }
+    return true;
+  }
+
+  if (replyToText.includes(TAG.edittpl)) {
+    const m = replyToText.match(/‹edittpl›:([0-9a-f]{4,})/);
+    const idPrefix = m?.[1];
+    if (!idPrefix) return false;
+    const prompt = (caption ?? "").trim();
+    try {
+      const previewUrl = await uploadTelegramPhotoToTemplateBucket(fileId);
+      const { data: rows } = await db.from("templates").select("id").like("id", `${idPrefix}%`).limit(1);
+      if (!rows?.[0]) {
+        await tgSendMessage(chatId, "Template not found.");
+        return true;
+      }
+      const patch: Record<string, unknown> = { preview_url: previewUrl };
+      if (prompt && prompt !== "-") patch.prompt = prompt;
+      const up = await (db.from("templates") as any).update(patch).eq("id", rows[0].id);
+      await tgSendMessage(chatId, up.error ? `❌ ${up.error.message}` : "✅ Updated", { reply_markup: mainMenu() });
+    } catch (error) {
+      await tgSendMessage(chatId, `❌ ${error instanceof Error ? error.message : "upload_failed"}`);
+    }
     return true;
   }
 
