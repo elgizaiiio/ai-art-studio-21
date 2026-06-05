@@ -64,9 +64,7 @@ export const createDodoCheckout = createServerFn({ method: "POST" })
       .maybeSingle();
     const name = [u?.first_name, u?.last_name].filter(Boolean).join(" ") || u?.username || `tg_${u?.telegram_id ?? userId}`;
     const email = `tg_${u?.telegram_id ?? userId}@gramai.app`;
-    const origin =
-      process.env.PUBLIC_APP_ORIGIN ??
-      "https://project--95395e69-8f2c-415e-995a-e5f4015731e7-dev.lovable.app";
+    const origin = process.env.PUBLIC_APP_ORIGIN ?? "https://gram.megsyai.com";
     const body = JSON.stringify({
       product_id: productId,
       quantity: 1,

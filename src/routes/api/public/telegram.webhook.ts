@@ -110,11 +110,7 @@ export const Route = createFileRoute("/api/public/telegram/webhook")({
           if (text.startsWith("/start")) {
             // Track /start press for admin stats
             try { await getAdmin().from("bot_events").insert({ telegram_id: from.id ?? chatId, event: "start", metadata: {} }); } catch {}
-            const origin = (() => {
-              const proto = request.headers.get("x-forwarded-proto") ?? "https";
-              const host = request.headers.get("host") ?? "project--95395e69-8f2c-415e-995a-e5f4015731e7.lovable.app";
-              return `${proto}://${host}`;
-            })();
+            const origin = "https://gram.megsyai.com";
             const caption = [
               "<b>Gram AI</b>",
               "All AI. One App.",
