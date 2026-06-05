@@ -8,6 +8,7 @@ export const authMe = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { requireUser } = await import("@/lib/telegram-auth.server");
     const user = await requireUser(data.initData);
+    const isPro = user.points > 0;
     return {
       id: user.id,
       telegramId: String(user.telegram_id),
@@ -17,5 +18,7 @@ export const authMe = createServerFn({ method: "POST" })
       points: user.points,
       totalReferrals: user.total_referrals,
       tonWallet: user.ton_wallet,
+      referralCode: user.referral_code ?? null,
+      isPro,
     };
   });
