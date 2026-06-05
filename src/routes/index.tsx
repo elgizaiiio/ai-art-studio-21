@@ -222,15 +222,6 @@ function HomePage() {
                 <div className="flex-1 max-w-[260px]">
                   <button onClick={() => setShowModelMenu((v) => !v)} className="inline-flex w-full items-center gap-1.5 rounded-full bg-white/10 border border-white/15 pl-2 pr-3 py-1.5 text-[12.5px] text-white">
                     <span className="truncate pl-1">{modelLabel}</span>
-                    {active !== "chat" && (
-                      currentModel.freeForAll ? (
-                        <span className="text-[9.5px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-400/15 text-emerald-300 border border-emerald-300/25">FREE</span>
-                      ) : currentModel.unlimitedForSubs && isPro ? (
-                        <span className="text-[9.5px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30">UNLIMITED · 0</span>
-                      ) : (
-                        <span className="text-[10.5px] text-white/60 tabular-nums">· {currentModel.cost}</span>
-                      )
-                    )}
                     <IconChevronDown className="ml-auto size-3.5 shrink-0" />
                   </button>
 
@@ -244,25 +235,8 @@ function HomePage() {
                             onClick={() => { setModelLabel(m.label); setShowModelMenu(false); }}
                             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition ${isSelected ? "bg-white/12 text-white" : "text-white/85 hover:bg-white/6"}`}
                           >
-                            <span className="flex-1 text-left truncate flex items-center gap-1.5">
-                              {m.label}
-                              {m.badge && (
-                                <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-white/10 text-white/70 border border-white/15">{m.badge}</span>
-                              )}
-                            </span>
-                            {m.freeForAll ? (
-                              <span className="text-[9.5px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-400/15 text-emerald-300 border border-emerald-300/25">FREE</span>
-                            ) : m.unlimitedForSubs && isPro ? (
-                              <span className="text-[9.5px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30">UNLIMITED · 0</span>
-                            ) : m.unlimitedForSubs ? (
-                              <span className="text-[9.5px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-400/15 text-amber-200/80 border border-amber-300/25">PRO · 0 cr</span>
-                            ) : m.pro && !isPro ? (
-                              <span className="text-[9.5px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30">PRO</span>
-                            ) : active === "chat" ? (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-400/15 text-emerald-300 border border-emerald-300/25">FREE</span>
-                            ) : (
-                              <span className="text-[11px] text-white/55 tabular-nums">{m.cost} cr</span>
-                            )}
+                            <span className="flex-1 text-left truncate">{m.label}</span>
+                            {isSelected && <IconCheck className="size-3.5 text-primary shrink-0" />}
                           </button>
                         );
                       })}
