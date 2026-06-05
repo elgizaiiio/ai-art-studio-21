@@ -14,7 +14,15 @@ export default defineConfig({
   },
   // Use Vercel preset when building for Vercel (NITRO_PRESET=vercel),
   // otherwise fall back to Cloudflare for Lovable hosting.
-  nitro: {
-    preset: process.env.NITRO_PRESET ?? "cloudflare-module",
-  },
+  nitro:
+    process.env.NITRO_PRESET === "vercel"
+      ? {
+          preset: "vercel",
+          output: {
+            dir: ".vercel/output",
+            serverDir: ".vercel/output/functions/__nitro.func",
+            publicDir: ".vercel/output/static",
+          },
+        }
+      : { preset: "cloudflare-module" },
 });
