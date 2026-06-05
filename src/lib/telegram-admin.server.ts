@@ -195,7 +195,8 @@ function splitTemplatePayload(payload: string) {
 async function uploadTelegramPhotoToTemplateBucket(fileId: string) {
   const db = getAdmin();
   const { bytes, filename, mime } = await tgGetFileBytes(fileId);
-  const path = `telegram-templates/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${filename}`;
+  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "-");
+  const path = `telegram-template-${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
   const upload = await db.storage.from("brand").upload(path, bytes, {
     contentType: mime,
     upsert: false,
