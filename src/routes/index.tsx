@@ -236,7 +236,15 @@ function HomePage() {
                             className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition ${isSelected ? "bg-white/12 text-white" : "text-white/85 hover:bg-white/6"}`}
                           >
                             <span className="flex-1 text-left truncate">{m.label}</span>
-                            {isSelected && <IconCheck className="size-3.5 text-primary shrink-0" />}
+                            {m.freeForAll ? (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-400/15 text-emerald-300 border border-emerald-300/25">FREE</span>
+                            ) : m.unlimitedForSubs && isPro ? (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30">PRO</span>
+                            ) : m.unlimitedForSubs || m.pro ? (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-400/15 text-amber-200/85 border border-amber-300/25">PRO · {m.cost} cr</span>
+                            ) : (
+                              <span className="text-[11px] text-white/60 tabular-nums">{m.cost} cr</span>
+                            )}
                           </button>
                         );
                       })}
