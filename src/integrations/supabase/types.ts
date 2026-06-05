@@ -17,20 +17,29 @@ export type Database = {
       bot_events: {
         Row: {
           created_at: string
+          event: string | null
           id: string
+          metadata: Json | null
           payload: Json | null
+          telegram_id: number | null
           type: string
         }
         Insert: {
           created_at?: string
+          event?: string | null
           id?: string
+          metadata?: Json | null
           payload?: Json | null
+          telegram_id?: number | null
           type: string
         }
         Update: {
           created_at?: string
+          event?: string | null
           id?: string
+          metadata?: Json | null
           payload?: Json | null
+          telegram_id?: number | null
           type?: string
         }
         Relationships: []
@@ -199,37 +208,55 @@ export type Database = {
       }
       tasks: {
         Row: {
+          active: boolean
           created_at: string
           description: string | null
           id: string
+          image_url: string | null
           is_active: boolean
+          link: string | null
           reward: number
+          sort_order: number
           title: string
           type: string | null
           updated_at: string
           url: string | null
+          verify_target: string | null
+          verify_type: string
         }
         Insert: {
+          active?: boolean
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean
+          link?: string | null
           reward?: number
+          sort_order?: number
           title: string
           type?: string | null
           updated_at?: string
           url?: string | null
+          verify_target?: string | null
+          verify_type?: string
         }
         Update: {
+          active?: boolean
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           is_active?: boolean
+          link?: string | null
           reward?: number
+          sort_order?: number
           title?: string
           type?: string | null
           updated_at?: string
           url?: string | null
+          verify_target?: string | null
+          verify_type?: string
         }
         Relationships: []
       }
@@ -278,10 +305,16 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
+          amount_points: number | null
+          amount_stars: number | null
+          amount_usd: number | null
           created_at: string
           currency: string
+          external_id: string | null
           id: string
+          kind: string | null
           metadata: Json | null
+          method: string | null
           points: number
           provider: string
           provider_tx_id: string | null
@@ -291,10 +324,16 @@ export type Database = {
         }
         Insert: {
           amount: number
+          amount_points?: number | null
+          amount_stars?: number | null
+          amount_usd?: number | null
           created_at?: string
           currency: string
+          external_id?: string | null
           id?: string
+          kind?: string | null
           metadata?: Json | null
+          method?: string | null
           points?: number
           provider: string
           provider_tx_id?: string | null
@@ -304,10 +343,16 @@ export type Database = {
         }
         Update: {
           amount?: number
+          amount_points?: number | null
+          amount_stars?: number | null
+          amount_usd?: number | null
           created_at?: string
           currency?: string
+          external_id?: string | null
           id?: string
+          kind?: string | null
           metadata?: Json | null
+          method?: string | null
           points?: number
           provider?: string
           provider_tx_id?: string | null
