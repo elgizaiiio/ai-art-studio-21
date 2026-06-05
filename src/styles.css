@@ -109,13 +109,19 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html, body { height: 100%; }
+  html, body {
+    height: 100%;
+    touch-action: pan-x pan-y;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   body {
     color: var(--color-foreground);
     background: var(--gradient-app);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+    overscroll-behavior: none;
   }
   /* Top blue glow shaped like the brand letter G */
   body::before {
