@@ -14,7 +14,379 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bot_events: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          metadata: Json
+          telegram_id: number
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          metadata?: Json
+          telegram_id: number
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          metadata?: Json
+          telegram_id?: number
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          attachments: Json
+          content: string
+          created_at: string
+          id: string
+          role: string
+          thread_id: string
+        }
+        Insert: {
+          attachments?: Json
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          thread_id: string
+        }
+        Update: {
+          attachments?: Json
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          mode: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mode?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mode?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_threads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generations: {
+        Row: {
+          cost: number
+          created_at: string
+          id: string
+          metadata: Json
+          model: string | null
+          prompt: string
+          provider: string
+          result_text: string | null
+          result_url: string | null
+          status: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          cost?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          model?: string | null
+          prompt: string
+          provider: string
+          result_text?: string | null
+          result_url?: string | null
+          status?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          cost?: number
+          created_at?: string
+          id?: string
+          metadata?: Json
+          model?: string | null
+          prompt?: string
+          provider?: string
+          result_text?: string | null
+          result_url?: string | null
+          status?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_completions: {
+        Row: {
+          created_at: string
+          id: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_completions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_completions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          link: string
+          reward: number
+          sort_order: number
+          title: string
+          verify_target: string | null
+          verify_type: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          link: string
+          reward?: number
+          sort_order?: number
+          title: string
+          verify_target?: string | null
+          verify_type?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          link?: string
+          reward?: number
+          sort_order?: number
+          title?: string
+          verify_target?: string | null
+          verify_type?: string
+        }
+        Relationships: []
+      }
+      templates: {
+        Row: {
+          active: boolean
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          prompt: string
+          sort_order: number
+          type: string
+        }
+        Insert: {
+          active?: boolean
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          prompt: string
+          sort_order?: number
+          type: string
+        }
+        Update: {
+          active?: boolean
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          prompt?: string
+          sort_order?: number
+          type?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount_points: number
+          amount_stars: number | null
+          amount_ton: number | null
+          amount_usd: number | null
+          created_at: string
+          external_id: string | null
+          id: string
+          kind: string
+          metadata: Json
+          method: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount_points?: number
+          amount_stars?: number | null
+          amount_ton?: number | null
+          amount_usd?: number | null
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          kind: string
+          metadata?: Json
+          method?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount_points?: number
+          amount_stars?: number | null
+          amount_ton?: number | null
+          amount_usd?: number | null
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          kind?: string
+          metadata?: Json
+          method?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          created_at: string
+          first_name: string | null
+          id: string
+          is_admin: boolean
+          language_code: string | null
+          last_name: string | null
+          photo_url: string | null
+          points: number
+          referred_by: string | null
+          telegram_id: number
+          ton_wallet: string | null
+          total_referrals: number
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          is_admin?: boolean
+          language_code?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          points?: number
+          referred_by?: string | null
+          telegram_id: number
+          ton_wallet?: string | null
+          total_referrals?: number
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          is_admin?: boolean
+          language_code?: string | null
+          last_name?: string | null
+          photo_url?: string | null
+          points?: number
+          referred_by?: string | null
+          telegram_id?: number
+          ton_wallet?: string | null
+          total_referrals?: number
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
