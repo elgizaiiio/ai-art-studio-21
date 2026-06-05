@@ -47,7 +47,7 @@ function applySafeAreaInsets(tg: TgWebApp) {
   const safe = tg.safeAreaInset;
   const top = Math.max(
     (content?.top ?? 0) + (safe?.top ?? 0),
-    tg.isFullscreen ? 56 : 0,
+    tg.isFullscreen ? 96 : 56,
   );
   const bottom = Math.max((content?.bottom ?? 0) + (safe?.bottom ?? 0), 0);
   document.documentElement.style.setProperty("--tg-safe-top", `${top}px`);
