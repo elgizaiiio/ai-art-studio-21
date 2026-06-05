@@ -101,6 +101,15 @@ export function getInitData(): string {
   return data;
 }
 
+export function getInitDataOrDevFallback(): string {
+  const data = getInitData();
+  if (data) return data;
+  if (typeof window === "undefined") return "";
+  const host = window.location.hostname;
+  const isDevHost = host === "localhost" || host === "127.0.0.1" || host.includes("preview");
+  return isDevHost ? "dev:999000001:dev_user" : "";
+}
+
 export function getStartParam(): string | null {
   const tg = getTg();
   return tg?.initDataUnsafe?.start_param ?? null;
