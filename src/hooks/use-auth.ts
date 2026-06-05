@@ -12,6 +12,7 @@ export type AuthedUser = {
   points: number;
   totalReferrals: number;
   tonWallet: string | null;
+  referralCode?: string | null;
   isPro?: boolean;
 };
 
@@ -37,6 +38,8 @@ export function useAuth() {
           points: u.points,
           totalReferrals: u.totalReferrals,
           tonWallet: u.tonWallet,
+          referralCode: u.referralCode,
+          isPro: u.isPro,
         });
       })
       .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : "auth_failed"); })
