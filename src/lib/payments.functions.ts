@@ -42,7 +42,8 @@ async function resolveUserId(initData: string): Promise<string> {
 // ---------- Dodo Payments ----------
 
 function dodoBase() {
-  // Default to LIVE; user can opt into test by setting DODO_ENV=test
+  // Default to LIVE Dodo. (No DODO_ENV secret needed — set DODO_ENV=test only if you want to
+  // explicitly test against the sandbox.)
   return process.env.DODO_ENV === "test" ? "https://test.dodopayments.com" : "https://live.dodopayments.com";
 }
 

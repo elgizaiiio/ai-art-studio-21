@@ -2,6 +2,23 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getModel } from "@/lib/models-catalog";
 
+// Send a freshly-generated asset to the user's Telegram chat (best-effort, never throws).
+async function deliverToTelegram(
+  telegramId: number | null | undefined,
+  url: string,
+  kind: "image" | "video" | "music",
+  prompt: string,
+) {
+  if (!telegramId || !url) return;
+  try {
+    const tg = await import("@/lib/telegram-bot.server");
+    const caption = `🪄 ${prompt.slice(0, 200)}`;
+    if (kind === "image") await tg.tgSendPhoto(telegramId, url, caption);
+    else if (kind === "video") await tg.tgSendVideo(telegramId, url, caption);
+    else await tg.tgSendMessage(telegramId, `🎵 ${caption}\n${url}`);
+  } catch {}
+}
+
 // ===== deAPI helpers (async jobs with polling) =====
 const DEAPI_BASE = "https://api.deapi.ai";
 
@@ -155,9 +172,11 @@ export const generateImage = createServerFn({ method: "POST" })
       await db.from("users").update({ points: user.points - cost }).eq("id", user.id);
     }
     const ins = await db.from("generations").insert({
-      user_id: user.id, type: "image", provider: entry.provider, model: entry.id,
-      prompt: data.prompt, result_url: resultUrl, cost, status: "done",
+      user_id: user.id, type: "image", model: entry.id,
+      prompt: data.prompt, output_url: resultUrl, cost, status: "done",
+      metadata: { provider: entry.provider, width: data.width, height: data.height },
     }).select("id").single();
+    await deliverToTelegram(user.telegram_id, resultUrl, "image", data.prompt);
     return { id: ins.data?.id ?? "", url: resultUrl, cost, pointsLeft: user.points - cost };
   });
 
@@ -254,9 +273,11 @@ export const generateVideo = createServerFn({ method: "POST" })
       await db.from("users").update({ points: user.points - cost }).eq("id", user.id);
     }
     await db.from("generations").insert({
-      user_id: user.id, type: "video", provider: entry.provider, model: entry.id,
-      prompt: data.prompt, result_url: videoUrl, cost, status: "done",
+      user_id: user.id, type: "video", model: entry.id,
+      prompt: data.prompt, output_url: videoUrl, cost, status: "done",
+      metadata: { provider: entry.provider },
     });
+    await deliverToTelegram(user.telegram_id, videoUrl, "video", data.prompt);
     return { url: videoUrl, cost, pointsLeft: user.points - cost };
   });
 
@@ -290,8 +311,10 @@ export const generateMusic = createServerFn({ method: "POST" })
 
     await db.from("users").update({ points: user.points - cost }).eq("id", user.id);
     await db.from("generations").insert({
-      user_id: user.id, type: "music", provider: "deapi", model: "ACE-Step-v1.5-turbo",
-      prompt: data.prompt, result_url: audioUrl, cost, status: "done",
+      user_id: user.id, type: "music", model: "ACE-Step-v1.5-turbo",
+      prompt: data.prompt, output_url: audioUrl, cost, status: "done",
+      metadata: { provider: "deapi", duration: data.duration },
     });
+    await deliverToTelegram(user.telegram_id, audioUrl, "music", data.prompt);
     return { url: audioUrl, cost, pointsLeft: user.points - cost };
   });
